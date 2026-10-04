@@ -191,6 +191,49 @@
         }
       }
     },
+    "/projects/{identifier}/scenes": {
+      "get": {
+        "summary": "List Scenes",
+        "operationId": "list_scenes_projects__identifier__scenes_get",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Scene"
+                  },
+                  "title": "Response List Scenes Projects  Identifier  Scenes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/style-packs": {
       "post": {
         "summary": "Create Pack",
@@ -315,6 +358,49 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StylePack"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/style-packs/{identifier}/versions": {
+      "get": {
+        "summary": "Pack Versions",
+        "operationId": "pack_versions_style_packs__identifier__versions_get",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Identifier"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "title": "Response Pack Versions Style Packs  Identifier  Versions Get"
                 }
               }
             }

@@ -116,6 +116,11 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
         artifact = await store_upload(identifier, file, 'source_scene')
         return manager().db.scenes.add(Scene(project_id=identifier, name=name, rgb_artifact_id=artifact.id, camera=metadata, model_checksum=model_checksum))
 
+    @app.get('/projects/{identifier}/scenes', response_model=list[Scene])
+    async def list_scenes(identifier: str):
+        manager().db.projects.get(identifier)
+        return manager().db.scenes.list(identifier)
+
     @app.post('/style-packs', response_model=StylePack, status_code=201)
     async def create_pack(body: StylePackCreate):
         if body.project_id:
@@ -129,6 +134,11 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
     @app.get('/style-packs/{identifier}', response_model=StylePack)
     async def get_pack(identifier: str, version: int | None = None):
         return manager().db.style_packs.get(identifier, version)
+
+    @app.get('/style-packs/{identifier}/versions', response_model=list[int])
+    async def pack_versions(identifier: str):
+        manager().db.style_packs.get(identifier)
+        return manager().db.style_packs.versions(identifier)
 
     @app.post('/style-packs/{identifier}/references', response_model=StylePack, status_code=201)
     async def add_reference(identifier: str, file: UploadFile = File(...), role: ReferenceRole = Form(...), source_note: str | None = Form(None), usage_rights_note: str | None = Form(None)):
