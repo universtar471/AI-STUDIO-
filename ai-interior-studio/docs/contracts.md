@@ -1,6 +1,6 @@
 # Hợp đồng dùng chung
 
-Trạng thái: **chờ A0 và NGUYEN duyệt**. Sau khi duyệt, không agent nào tự sửa các file trong `services/core/domain` và `services/core/storage`; đề xuất thay đổi ghi vào `docs/contract-requests.md`.
+Trạng thái: **đã duyệt 05/10/2026** (NGUYEN duyệt cả 6 điểm ở mục 6). Từ nay không agent nào tự sửa các file trong `services/core/domain` và `services/core/storage`; đề xuất thay đổi ghi vào `docs/contract-requests.md`.
 
 Mọi module khác import từ hai gói:
 
@@ -75,7 +75,7 @@ Vai trò tham chiếu và ưu tiên mặc định (`ROLE_DEFAULT_PRIORITY`): BAS
 - `Database`: `projects`, `scenes`, `rooms`, `jobs` có `add / get / find / list / save`; `artifacts` chỉ có `add` (không sửa); `style_packs` có `add_version / get(id, version=None) / versions / list_latest`.
 - `JobRepo` thêm `list_by_state`, `retries_of`, `children_of`.
 
-## 6. Điểm khác đặc tả v1.0, cần bạn duyệt
+## 6. Điểm khác đặc tả v1.0 (đã duyệt 05/10/2026)
 
 1. **FAILED được sang RETRY.** Đặc tả không có đường nào ra khỏi FAILED.
 2. **RETRY là trạng thái kết của job cũ.** Retry luôn tạo job mới (`retry_of`), đúng tiêu chí "new job links parent, old artifact immutable" ở mục 11. `parent_job_id` chỉ dùng cho quan hệ đầu vào: job edit hoặc upscale trỏ về job gốc.

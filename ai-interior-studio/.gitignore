@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.env
+node_modules/
+dist/
+build/
+# local runtime data (data_root for dev runs)
+data/

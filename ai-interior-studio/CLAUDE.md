@@ -18,7 +18,7 @@ App Windows cho một người dùng: render nội thất từ SketchUp (Mode A)
 
 ## Trạng thái hiện tại
 
-A1 Nền tảng đã xong (155 test xanh). Việc kế tiếp: chủ dự án duyệt mục 6 của `docs/contracts.md`, rồi giao A2 API & Job.
+A1 Nền tảng đã xong (155 test xanh). `docs/contracts.md` đã duyệt 05/10/2026. Đang giao A2 API & Job: đề bài ở `docs/agent-tasks/a2-api.md`.
 
 ## Lệnh
 
