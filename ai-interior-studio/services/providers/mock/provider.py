@@ -9,6 +9,7 @@ from services.core.domain import (
     JobError, ProviderCapabilities, ProviderHealth, ProviderJob, ProviderOutput,
     ProviderStatus, RenderMetrics, RenderMode, RenderRequest, ValidationResult, new_id,
 )
+from services.core.prompts import render_flux
 
 def _chunk(kind: bytes, data: bytes) -> bytes:
     return struct.pack('>I', len(data)) + kind + data + struct.pack('>I', zlib.crc32(kind + data))
@@ -47,7 +48,7 @@ class MockProvider:
         identifier = new_id()
         self._jobs[identifier] = (time.monotonic(), request, self.failure)
         return ProviderJob(provider_job_id=identifier, provider_request={
-            'provider': self.id, 'prompt': request.prompt.raw_text or '',
+            'provider': self.id, 'prompt': render_flux(request.prompt),  # same text a FLUX provider would send
             'request': request.model_dump(mode='json'),
         })
 
