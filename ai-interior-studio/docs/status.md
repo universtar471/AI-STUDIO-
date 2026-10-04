@@ -1,17 +1,17 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 1** — A2 đã hợp nhất; kế tiếp A9 chạy cổng G1.
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 1 xong** — G1 A9 đề xuất ĐẠT (`docs/gates/G1.md`); **chờ NGUYEN duyệt G1** trước khi mở Đợt 2.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
 | A1 Nền tảng | 1 | Xong, 155 test xanh; `docs/contracts.md` đã duyệt 05/10/2026 | main | - |
 | A2 API & Job | 1 | Xong, review ĐẠT, đã merge `main` (175 test xanh) | đã xoá `wt/a2-api` | 4 mục NÊN SỬA trong `docs/agent-reviews/a2-api.md` chuyển cho A3/A4 |
-| A9 Kiểm thử | 1 | Chưa giao; việc kế: test tích hợp + kiểm cổng G1 | - | Chờ NGUYEN cho giao |
+| A9 Kiểm thử | 1 | Xong Đợt 1: test tích hợp backend thật + G1 ĐẠT, đã merge (180 test xanh) | đã xoá `wt/a9-g1` | Bộ ảnh chuẩn chặn bởi Đợt 0 |
 | Đợt 0 kiểm chứng tay | 0 | Chưa bắt đầu | - | Cần NGUYEN chạy trên máy có GPU |
 
 ## Đề bài đang mở
 
-Không có. A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
+Không có. A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
 
 ## Ghi chú A0
 
