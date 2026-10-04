@@ -7,7 +7,7 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong v
 | A1 Nền tảng | 1 | Xong, 155 test xanh; `docs/contracts.md` đã duyệt 05/10/2026 | main | - |
 | A2 API & Job | 1 | Xong, review ĐẠT, đã merge `main` (175 test xanh) | đã xoá `wt/a2-api` | 4 mục NÊN SỬA trong `docs/agent-reviews/a2-api.md` chuyển cho A3/A4 |
 | A9 Kiểm thử | 1 | Xong Đợt 1: test tích hợp backend thật + G1 ĐẠT, đã merge (180 test xanh) | đã xoá `wt/a9-g1` | Bộ ảnh chuẩn chặn bởi Đợt 0 |
-| A3 ComfyUI | 2 | Phần 1 (adapter, manifest, preflight; test bằng ComfyUI giả) đã giao Codex | `wt/a3-comfyui` | Workflow thật + model chờ Đợt 0 |
+| A3 ComfyUI | 2 | Phần 1 (adapter, manifest, preflight) xong: Codex viết, review ĐẠT, merge (237 test) | đã xoá | Workflow thật + model chờ Đợt 0; 5 mục NÊN SỬA trong `docs/agent-reviews/a3-comfyui.md` |
 | A4 Gemini | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Chưa gọi Gemini thật lần nào |
 | A5 Prompt & Reference | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Orchestrator chưa dùng A5 (nối cùng A3) |
 | A6 Giao diện | 2 | Xong, review ĐẠT, merge (Claude làm); đã chạy tay trong trình duyệt; thêm URL dự án `#/projects/<id>` | đã xoá | Chưa có nút Loại (hợp đồng không có) |
@@ -15,7 +15,6 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong v
 
 ## Đề bài đang mở
 
-- A3 phần 1: `docs/agent-tasks/a3-comfyui.md` (Codex).
 - A0 nối A5 vào orchestrator + NÊN SỬA A2: xong, merge (218 test).
 - A9 Đợt 2 (bộ ảnh chuẩn, `run_golden`, cổng G2): chờ Đợt 0 và A3.
 
