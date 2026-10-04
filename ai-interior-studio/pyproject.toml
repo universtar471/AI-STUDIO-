@@ -11,6 +11,8 @@ dependencies = [
   "uvicorn>=0.30",   # Windows ASGI backend entry point
   "websockets>=13",  # WebSocket transport for uvicorn
   "python-multipart>=0.0.18",  # scene and reference image uploads
+  "google-genai>=2.0",  # official Gemini SDK for the optional cloud provider
+  "keyring>=25",  # API keys in Windows Credential Manager instead of files
   "pillow>=10.1",  # Style Pack checks: size, blur, perceptual hash
 ]
 
