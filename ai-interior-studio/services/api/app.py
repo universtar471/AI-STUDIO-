@@ -17,13 +17,31 @@ from services.core.domain import (
 )
 from services.core.orchestration import JobManager, OrchestrationError, provider_health
 from services.core.storage import DataRoot, Database
+from services.providers.gemini import GeminiImageProvider, StorageImageSource
 from services.providers.mock import MockProvider
 from .schemas import FinalizeRequest, HealthResponse, ProjectCreate, ProviderInfo, StylePackCreate
 
 
+class _ManagerImages:
+    """Gemini reads input images through the running app's database, which only exists after startup."""
+
+    def __init__(self, app: FastAPI):
+        self.app = app
+
+    def _source(self) -> StorageImageSource:
+        manager = self.app.state.manager
+        return StorageImageSource(manager.db, manager.artifacts)
+
+    def base_image(self, request):
+        return self._source().base_image(request)
+
+    def image(self, artifact_id):
+        return self._source().image(artifact_id)
+
+
 def create_app(data_root: Path | str | None = None, *, providers: list[ImageProvider] | None = None, timeout: float = 120, poll_interval: float = .1) -> FastAPI:
     root = DataRoot(Path(data_root or os.environ.get('AI_STUDIO_DATA_ROOT', Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'AIInteriorStudio')))
-    adapters = providers if providers is not None else [MockProvider()]
+    adapters: list[ImageProvider] = providers if providers is not None else [MockProvider()]
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -38,6 +56,9 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
             db.close()
 
     app = FastAPI(title='AI Interior Studio API', version='0.1.0', lifespan=lifespan)
+    if providers is None:
+        # Cloud path is optional: without a key it reports unavailable and is skipped.
+        adapters.append(GeminiImageProvider(_ManagerImages(app), usage_path=root.root / 'cache' / 'gemini_usage.json'))
 
     def manager() -> JobManager:
         return app.state.manager
