@@ -1,0 +1,17 @@
+{
+  "name": "test-only", "template": "template.json",
+  "models": [{"path": "checkpoints/dummy.bin", "object_info": {"class_type": "TestLoader", "input": "model"}}],
+  "custom_nodes": [{"class_type": "TestOnly", "version": "test-1"}],
+  "bindings": {
+    "source_image": {"node_id": "1", "input": "source"},
+    "reference_image": [{"node_id": "1", "input": "ref"}],
+    "prompt": {"node_id": "1", "input": "text"},
+    "long_edge": {"node_id": "1", "input": "edge"},
+    "seed": {"node_id": "1", "input": "seed"},
+    "filename_prefix": {"node_id": "1", "input": "prefix"},
+    "steps": {"node_id": "1", "input": "steps"},
+    "cfg": {"node_id": "1", "input": "cfg"}
+  },
+  "presets": {"PREVIEW_FAST": {"long_edge": 1024, "steps": 4, "cfg": 1.0}, "PREVIEW_QUALITY": {"long_edge": 1536, "steps": 8, "cfg": 2.0}},
+  "max_reference_images": 1, "license_note": "Synthetic test fixture; not a runnable image workflow."
+}

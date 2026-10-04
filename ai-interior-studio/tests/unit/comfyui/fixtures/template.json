@@ -1,0 +1,4 @@
+{
+  "1": {"class_type": "TestOnly", "inputs": {"source": "", "ref": "", "text": "", "edge": 1, "seed": 0, "prefix": "", "steps": 1, "cfg": 1, "untouched": ["2", 0]}},
+  "2": {"class_type": "TestLoader", "inputs": {"model": "dummy.bin"}}
+}
