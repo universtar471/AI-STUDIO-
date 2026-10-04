@@ -18,7 +18,9 @@ App Windows cho một người dùng: render nội thất từ SketchUp (Mode A)
 
 ## Trạng thái hiện tại
 
-A1 Nền tảng đã xong (155 test xanh). `docs/contracts.md` đã duyệt 05/10/2026. A2 API & Job đã xong và merge. A9 chạy cổng G1: đề xuất ĐẠT (`docs/gates/G1.md`, 180 test xanh). G1 đã duyệt 05/10/2026. Đang Đợt 2 (A3, A4, A5, A6, A9); xem `docs/status.md`.
+A1 Nền tảng đã xong (155 test xanh). `docs/contracts.md` đã duyệt 05/10/2026. A2 API & Job đã xong và merge. A9 chạy cổng G1: đề xuất ĐẠT (`docs/gates/G1.md`, 180 test xanh). G1 đã duyệt 05/10/2026. Đợt 2: A4, A5, A6 xong; A3 và cổng G2 chờ Đợt 0. Xem `docs/status.md`.
+
+Giao diện: `apps/web` (`npm run dev`, cần backend `python -m services.api`).
 
 ## Lệnh
 

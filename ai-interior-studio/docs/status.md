@@ -1,6 +1,6 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — G1 đã duyệt 05/10/2026 (`docs/gates/G1.md`).
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong và đã merge (213 test Python + 8 test web). **Cổng G2 chưa chạy được**: chờ Đợt 0 (workflow ComfyUI + 5 cảnh + Style Pack) để làm A3 và bộ ảnh chuẩn.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
@@ -8,16 +8,17 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — G1 đã duyệt 0
 | A2 API & Job | 1 | Xong, review ĐẠT, đã merge `main` (175 test xanh) | đã xoá `wt/a2-api` | 4 mục NÊN SỬA trong `docs/agent-reviews/a2-api.md` chuyển cho A3/A4 |
 | A9 Kiểm thử | 1 | Xong Đợt 1: test tích hợp backend thật + G1 ĐẠT, đã merge (180 test xanh) | đã xoá `wt/a9-g1` | Bộ ảnh chuẩn chặn bởi Đợt 0 |
 | A3 ComfyUI | 2 | Chặn | - | Cần 2 workflow API JSON + danh sách model từ Đợt 0 |
-| A4 Gemini | 2 | Đã giao (Claude làm) | `wt/a4-gemini` | Chạy thật cần key của NGUYEN |
-| A5 Prompt & Reference | 2 | Đã giao (Claude làm) | `wt/a5-prompts` | - |
-| A6 Giao diện | 2 | Đã giao (Claude làm) | `wt/a6-web` | - |
+| A4 Gemini | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Chưa gọi Gemini thật lần nào |
+| A5 Prompt & Reference | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Orchestrator chưa dùng A5 (nối cùng A3) |
+| A6 Giao diện | 2 | Xong, review ĐẠT, merge (Claude làm); đã chạy tay trong trình duyệt | đã xoá | Chưa có nút Loại (hợp đồng không có) |
 | Đợt 0 kiểm chứng tay | 0 | Chưa bắt đầu | - | Cần NGUYEN chạy trên máy có GPU |
 
 ## Đề bài đang mở
 
-- Đợt 2: `docs/agent-tasks/a5-prompts.md`, `a4-gemini.md`, `a6-web.md`. A3 chờ Đợt 0.
+- A3 ComfyUI: chưa viết đề bài, chờ Đợt 0.
+- A9 Đợt 2 (bộ ảnh chuẩn, `run_golden`, cổng G2): chờ Đợt 0 và A3.
 
-Đã đóng: A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
+Đã đóng: A4, A5, A6 (đề bài, note, review trong `docs/agent-*`). A0 thêm vào API: đăng ký Gemini, `GET /projects/{id}/scenes`, `GET /style-packs/{id}/versions`. A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
 
 ## Ghi chú A0
 
