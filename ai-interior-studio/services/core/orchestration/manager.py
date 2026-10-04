@@ -3,15 +3,19 @@ from __future__ import annotations
 
 import asyncio
 from contextlib import suppress
+import logging
 import time
 
 from services.core.domain import (
     IN_FLIGHT_STATES, DomainError, ErrorCode, ImageProvider, JobError, JobProgressEvent,
-    JobState, ReferenceSlot, RenderJob, RenderRequest, RenderResult,
+    JobState, PromptSpec, ReferenceSlot, RenderJob, RenderRequest, RenderResult,
     ensure_can_finalize, new_job, retry_job, transition,
 )
+from services.core.prompts import build_prompt_spec, prompt_version
 from services.core.storage import ArtifactStore, DataRoot, Database, JobFiles
 from .selection import OrchestrationError, select_provider
+
+log = logging.getLogger(__name__)
 
 
 class JobManager:
@@ -53,15 +57,22 @@ class JobManager:
 
     def _inputs(self, job: RenderJob) -> None:
         self._snapshot(job, 'request.json', job.request)
-        self._snapshot(job, 'prompt.txt', job.request.prompt.raw_text or '')
         self._snapshot(job, 'refs.json', [r.model_dump(mode='json') for r in job.request.references])
 
-    def _finish_files(self, job: RenderJob, duration: float = 0) -> None:
+    def _prompt_file(self, job: RenderJob, text: str) -> str:
+        """prompt.txt holds the text the provider actually received; returns its prompt_version."""
+        self._snapshot(job, 'prompt.txt', text)
+        return prompt_version(job.request.prompt, text)
+
+    def _finish_files(self, job: RenderJob, duration: float = 0, *, version: str | None = None, error_class: str | None = None) -> None:
         self._inputs(job)
+        # Never submitted: fall back to the user's own text (or empty) so the snapshot set is complete.
+        fallback = self._prompt_file(job, job.request.prompt.raw_text or '')
         self._snapshot(job, 'provider_request.json', {'submitted': False})
         self._snapshot(job, 'metrics.json', {
-            'duration_s': duration, 'state': job.state,
+            'duration_s': duration, 'state': job.state, 'prompt_version': version or fallback,
             'error': job.error.model_dump(mode='json') if job.error else None,
+            'error_class': error_class,
             'provider_metrics': job.result.metrics.model_dump(mode='json') if job.result else {},
         })
 
@@ -120,7 +131,18 @@ class JobManager:
             request = request.model_copy(update={'style_pack_version': pack.version, 'references': references})
         for reference in request.references:
             self._owned(self.db.artifacts, reference.artifact_id, request.project_id)
-        return request
+        return self._with_prompt(request)
+
+    def _with_prompt(self, request: RenderRequest) -> RenderRequest:
+        """An empty prompt is built from the scene and the locked Style Pack version (A5), once, at submit.
+
+        The built spec is stored on the job, so a retry or a restart sends the same prompt.
+        """
+        if request.prompt != PromptSpec() or not request.source.scene_id:
+            return request
+        scene = self.db.scenes.get(request.source.scene_id)
+        pack = self.db.style_packs.get(request.style_pack_id, request.style_pack_version) if request.style_pack_id else None
+        return request.model_copy(update={'prompt': build_prompt_spec(scene=scene, style_pack=pack)})
 
     def _enqueue(self, job: RenderJob) -> RenderJob:
         self.db.jobs.add(job)
@@ -182,12 +204,17 @@ class JobManager:
     async def _execute(self, identifier: str) -> None:
         started = time.monotonic()
         job = self._save(transition(self.db.jobs.get(identifier), JobState.RUNNING))
+        version: str | None = None
+        error_class: str | None = None
+        provider: ImageProvider | None = None
         try:
             async with asyncio.timeout(self.timeout):
                 provider = await select_provider(self.providers, job.request)
                 handle = await provider.submit(job.request)
                 self._handles[identifier] = (provider, handle.provider_job_id)
                 self._snapshot(job, 'provider_request.json', handle.provider_request)
+                sent = handle.provider_request.get('prompt')
+                version = self._prompt_file(job, sent if isinstance(sent, str) else job.request.prompt.raw_text or '')
                 job = self._save(job.model_copy(update={'provider_id': provider.id, 'provider_job_id': handle.provider_job_id}))
                 while True:
                     status = await provider.poll(handle.provider_job_id)
@@ -208,7 +235,9 @@ class JobManager:
                         result = RenderResult(artifact_ids=artifacts, provider_id=provider.id, model=outputs[0].model if outputs else None, seed=outputs[0].seed if outputs else None, metrics=status.metrics)
                         job = transition(job, JobState.REVIEW, result=result)
                         break
-                    job = self._save(job.model_copy(update={'progress': status.progress, 'stage': status.stage}))
+                    if (status.progress, status.stage) != (job.progress, job.stage):
+                        # Only real changes hit SQLite and the WebSocket; polls are frequent.
+                        job = self._save(job.model_copy(update={'progress': status.progress, 'stage': status.stage}))
                     await asyncio.sleep(self.poll_interval)
         except asyncio.CancelledError:
             await self._cancel_provider(identifier)
@@ -220,6 +249,9 @@ class JobManager:
         except Exception as exc:
             await self._cancel_provider(identifier)
             code = exc.code if isinstance(exc, OrchestrationError) else 'PROVIDER_ERROR'
+            # Class name only: exception messages can carry keys or request headers.
+            error_class = type(exc).__name__
+            log.warning('Job %s failed in provider %s: %s', identifier, provider.id if provider else '-', error_class)
             job = transition(job, JobState.FAILED, error=JobError(code=code, message='Render execution failed; inspect provider health'))
-        self._finish_files(job, time.monotonic() - started)
+        self._finish_files(job, time.monotonic() - started, version=version, error_class=error_class)
         self._save(job)

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type Saved } from '../api/client';
 import type { JobProgressEvent, Project, ProviderInfo, RenderJob, Scene, StylePack } from '../api/types';
 import { applyEvent, upsertJob } from '../lib/jobs';
@@ -43,13 +43,15 @@ export function ProjectView({ project, subscribe }: Props) {
     }).catch(() => undefined);
   }, [project.id]);
 
+  // Latest list for the event handler, so side effects stay out of the state updater.
+  const jobsRef = useRef(jobs);
+  jobsRef.current = jobs;
+
   useEffect(() => subscribe((event) => {
-    setJobs((list) => {
-      const { jobs: next, unknown } = applyEvent(list, event);
-      // Terminal states carry results/errors the event does not include: fetch the full job.
-      if (unknown || ['REVIEW', 'FAILED', 'APPROVED', 'CANCELLED', 'DONE'].includes(event.state)) refetch(event.job_id);
-      return next;
-    });
+    const { unknown } = applyEvent(jobsRef.current, event);
+    setJobs((list) => applyEvent(list, event).jobs);
+    // Terminal states carry results/errors the event does not include: fetch the full job.
+    if (unknown || ['REVIEW', 'FAILED', 'APPROVED', 'CANCELLED', 'DONE'].includes(event.state)) refetch(event.job_id);
   }), [subscribe, refetch]);
 
   const openJob = jobs.find((j) => j.id === openId);
