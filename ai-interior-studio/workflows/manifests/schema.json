@@ -1,0 +1,235 @@
+{
+  "$defs": {
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "node_id": {
+          "minLength": 1,
+          "title": "Node Id",
+          "type": "string"
+        },
+        "input": {
+          "minLength": 1,
+          "title": "Input",
+          "type": "string"
+        }
+      },
+      "required": [
+        "node_id",
+        "input"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "Bindings": {
+      "additionalProperties": false,
+      "properties": {
+        "source_image": {
+          "$ref": "#/$defs/Binding"
+        },
+        "reference_image": {
+          "items": {
+            "$ref": "#/$defs/Binding"
+          },
+          "title": "Reference Image",
+          "type": "array"
+        },
+        "prompt": {
+          "$ref": "#/$defs/Binding"
+        },
+        "long_edge": {
+          "$ref": "#/$defs/Binding"
+        },
+        "seed": {
+          "$ref": "#/$defs/Binding"
+        },
+        "filename_prefix": {
+          "$ref": "#/$defs/Binding"
+        },
+        "steps": {
+          "$ref": "#/$defs/Binding"
+        },
+        "cfg": {
+          "$ref": "#/$defs/Binding"
+        }
+      },
+      "required": [
+        "source_image",
+        "reference_image",
+        "prompt",
+        "long_edge",
+        "seed",
+        "filename_prefix",
+        "steps",
+        "cfg"
+      ],
+      "title": "Bindings",
+      "type": "object"
+    },
+    "CustomNode": {
+      "additionalProperties": false,
+      "properties": {
+        "class_type": {
+          "minLength": 1,
+          "title": "Class Type",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "class_type",
+        "version"
+      ],
+      "title": "CustomNode",
+      "type": "object"
+    },
+    "ModelFile": {
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-fA-F0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        },
+        "object_info": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ModelLookup"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "title": "ModelFile",
+      "type": "object"
+    },
+    "ModelLookup": {
+      "additionalProperties": false,
+      "properties": {
+        "class_type": {
+          "minLength": 1,
+          "title": "Class Type",
+          "type": "string"
+        },
+        "input": {
+          "minLength": 1,
+          "title": "Input",
+          "type": "string"
+        }
+      },
+      "required": [
+        "class_type",
+        "input"
+      ],
+      "title": "ModelLookup",
+      "type": "object"
+    },
+    "Preset": {
+      "additionalProperties": false,
+      "properties": {
+        "long_edge": {
+          "exclusiveMinimum": 0,
+          "title": "Long Edge",
+          "type": "integer"
+        },
+        "steps": {
+          "exclusiveMinimum": 0,
+          "title": "Steps",
+          "type": "integer"
+        },
+        "cfg": {
+          "minimum": 0,
+          "title": "Cfg",
+          "type": "number"
+        }
+      },
+      "required": [
+        "long_edge",
+        "steps",
+        "cfg"
+      ],
+      "title": "Preset",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "template": {
+      "title": "Template",
+      "type": "string"
+    },
+    "models": {
+      "items": {
+        "$ref": "#/$defs/ModelFile"
+      },
+      "title": "Models",
+      "type": "array"
+    },
+    "custom_nodes": {
+      "items": {
+        "$ref": "#/$defs/CustomNode"
+      },
+      "title": "Custom Nodes",
+      "type": "array"
+    },
+    "bindings": {
+      "$ref": "#/$defs/Bindings"
+    },
+    "presets": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Preset"
+      },
+      "title": "Presets",
+      "type": "object"
+    },
+    "max_reference_images": {
+      "minimum": 0,
+      "title": "Max Reference Images",
+      "type": "integer"
+    },
+    "license_note": {
+      "minLength": 1,
+      "title": "License Note",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "template",
+    "models",
+    "custom_nodes",
+    "bindings",
+    "presets",
+    "max_reference_images",
+    "license_note"
+  ],
+  "title": "Manifest",
+  "type": "object"
+}
