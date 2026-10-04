@@ -1,6 +1,6 @@
 # Đề bài A2: API & Job (Đợt 1)
 
-Giao ngày 05/10/2026 bởi A0. Nhánh: `agent/a2-api`. Hợp đồng `docs/contracts.md` đã duyệt.
+Giao ngày 05/10/2026 bởi A0. Nhánh: `wt/a2-api`. Hợp đồng `docs/contracts.md` đã duyệt.
 
 ## Đọc trước
 
@@ -66,4 +66,4 @@ pytest
 
 ## Bàn giao
 
-Ghi `docs/agent-notes/a2-api.md`: kế hoạch, file đã đổi, lệnh chạy, kết quả test (dán dòng tổng kết pytest), việc còn lại, cạm bẫy. Commit trên `agent/a2-api` rồi báo tên nhánh. Không tự merge vào `main`; A0 duyệt rồi hợp nhất.
+Ghi `docs/agent-notes/a2-api.md`: kế hoạch, file đã đổi, lệnh chạy, kết quả test (dán dòng tổng kết pytest), việc còn lại, cạm bẫy. Commit trên `wt/a2-api` rồi báo tên nhánh. Không tự merge vào `main`; A0 duyệt rồi hợp nhất.
