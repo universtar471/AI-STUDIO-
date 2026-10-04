@@ -47,6 +47,7 @@ export const api = {
   providers: () => request<ProviderInfo[]>('/providers'),
 
   projects: () => request<Saved<Project>[]>('/projects'),
+  project: (id: string) => request<Saved<Project>>(`/projects/${id}`),
   createProject: (body: ProjectCreate) => request<Saved<Project>>('/projects', json(body)),
   scenes: (projectId: string) => request<Saved<Scene>[]>(`/projects/${projectId}/scenes`),
   importScene: (projectId: string, file: File, name: string) =>
