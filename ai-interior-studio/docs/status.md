@@ -1,19 +1,20 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 1** (A2 đang được giao).
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 1** — A2 đã hợp nhất; kế tiếp A9 chạy cổng G1.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
 | A1 Nền tảng | 1 | Xong, 155 test xanh; `docs/contracts.md` đã duyệt 05/10/2026 | main | - |
-| A2 API & Job | 1 | Đã giao cho Codex, đang làm | `wt/a2-api` | Codex hết hạn mức thì Claude làm tiếp |
-| A9 Kiểm thử | 1 | Chưa bắt đầu; nhận việc khi A2 có API chạy được | - | - |
+| A2 API & Job | 1 | Xong, review ĐẠT, đã merge `main` (175 test xanh) | đã xoá `wt/a2-api` | 4 mục NÊN SỬA trong `docs/agent-reviews/a2-api.md` chuyển cho A3/A4 |
+| A9 Kiểm thử | 1 | Chưa giao; việc kế: test tích hợp + kiểm cổng G1 | - | Chờ NGUYEN cho giao |
 | Đợt 0 kiểm chứng tay | 0 | Chưa bắt đầu | - | Cần NGUYEN chạy trên máy có GPU |
 
 ## Đề bài đang mở
 
-- A2: `docs/agent-tasks/a2-api.md`
+Không có. A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
 
 ## Ghi chú A0
 
 - Repo chưa có `.gitignore` ở lần kiểm đầu; đã thêm để chặn `*.egg-info`, `.venv`, cache và dữ liệu chạy thử.
 - Nhánh agent dùng quy ước máy `wt/<tên>` (tạo bằng `agent-wt`), thay cho `agent/<tên>` trong kế hoạch; ý nghĩa giữ nguyên: mỗi agent một nhánh.
+- A2: Codex viết code nhưng hết hạn mức trước khi commit; A0 commit hộ nguyên văn và tự duyệt. A9 cần kiểm độc lập ở G1.
