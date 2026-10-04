@@ -1,0 +1,23 @@
+[project]
+name = "ai-interior-studio"
+version = "0.1.0"
+description = "AI Interior Studio - render from SketchUp and concept from plan"
+requires-python = ">=3.11"
+dependencies = [
+  "pydantic>=2.6",    # schemas and validation for every shared contract
+  "sqlalchemy>=2.0",  # SQLite persistence
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["services*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
