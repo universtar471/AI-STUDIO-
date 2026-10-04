@@ -1,6 +1,6 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 1 xong** — G1 A9 đề xuất ĐẠT (`docs/gates/G1.md`); **chờ NGUYEN duyệt G1** trước khi mở Đợt 2.
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — G1 đã duyệt 05/10/2026 (`docs/gates/G1.md`).
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
