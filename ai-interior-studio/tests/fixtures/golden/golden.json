@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "note": "Images are the owner's and are not committed (public repo). Put them under data/golden/ (or pass --golden-dir); sha256 pins the exact files.",
+  "required_scenes": 5,
+  "seed": 7,
+  "style_pack": {
+    "name": "Japandi",
+    "palette": ["#E8DFD3", "#C9B49A", "#8C6F56", "#4A3B30"],
+    "references": [
+      {"file": "style/master_kitchen.jpg", "role": "STYLE_MASTER", "sha256": "da36d3e7ed30698999aaecf30c4d359d55036d746a575a6f9f883099ae49c0ce", "source_note": "D:/JAPANDI/a5fbbe33dbce54205079787d7b4ea6dc.jpg"},
+      {"file": "style/kitchen_collage.jpg", "role": "CABINET", "sha256": "f2f70165827686bf0f775831743700e8673483b31af0e5adfd6eff36aa719068", "source_note": "D:/JAPANDI/tai xuong (1).jpg"},
+      {"file": "style/material_board.jpg", "role": "FLOOR", "sha256": "506d53672b44d8895b245493f47790850a7d1c6b5b3b4e9338b2ca0dfce1aea3", "source_note": "D:/JAPANDI/af27dc02e457f435015cc5756027ab42.jpg"},
+      {"file": "style/palette_board.jpg", "role": "DECOR", "sha256": "cc93cfd1197b146b8ead455d8b14407487e5fab7ac14055d54287a35c3138c6b", "source_note": "D:/JAPANDI/75194552d0fe363ccff678a18f87a642.jpg"}
+    ]
+  },
+  "scenes": [
+    {"id": "kitchen_arches", "name": "Kitchen arches", "file": "scenes/kitchen_arches.jpg", "sha256": "3ccc3268ec76703a1a3f54320af8c02455a08bee7bafcfcaa02603eb265b6961",
+     "must_keep": ["camera", "three arched windows", "island with two stools", "two rattan pendants", "oven column", "arched doorway"]},
+    {"id": "kitchen_beams", "name": "Kitchen beams", "file": "scenes/kitchen_beams.jpg", "sha256": "6b21c59d61ddbd3c383d9b220d0a57aab671b78197a13601fc06b9669810ab83",
+     "must_keep": ["camera", "roof trusses", "glass wall cabinets", "island with four stools", "painting on the left wall", "linear pendant", "dining table and vases in the foreground"]}
+  ]
+}
