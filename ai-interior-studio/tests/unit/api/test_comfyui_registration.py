@@ -22,13 +22,14 @@ def test_default_providers_offline_comfyui_and_storage_images(tmp_path, monkeypa
     path = tmp_path / 'comfy.json'
     path.write_text(json.dumps({'url': 'http://comfy.invalid:9999'}))
     monkeypatch.setenv('AI_STUDIO_COMFYUI_CONFIG', str(path))
+    monkeypatch.setenv('AI_STUDIO_ENABLE_MOCK', '1')
     app = create_app(tmp_path / 'data', poll_interval=.001)
     with TestClient(app) as client:
         response = client.get('/providers')
         assert response.status_code == 200
-        assert [p['id'] for p in response.json()] == ['mock', 'comfyui', 'gemini']
-        assert response.json()[1]['health']['status'] == 'unavailable'
-        comfy = app.state.manager.providers[1]
+        assert [p['id'] for p in response.json()] == ['comfyui', 'gemini', 'mock']
+        assert response.json()[0]['health']['status'] == 'unavailable'
+        comfy = app.state.manager.providers[0]
         assert comfy.config.url == 'http://comfy.invalid:9999'
         project = client.post('/projects', json={'name': 'Test'}).json()
         scene = client.post(f"/projects/{project['id']}/scenes/import",
