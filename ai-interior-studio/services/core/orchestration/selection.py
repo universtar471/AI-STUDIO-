@@ -31,9 +31,9 @@ async def select_provider(providers: list[ImageProvider], request: RenderRequest
             continue
         if request.mode not in c.supported_modes:
             continue
-        if len(request.references) > c.max_reference_images:
-            continue
-        if len(request.references) > 1 and not c.supports_multi_reference:
+        # Providers pack extra references into their own slots (select_references) and describe
+        # the dropped ones in the prompt, so only a provider without any reference slot is unfit.
+        if request.references and c.max_reference_images == 0:
             continue
         if c.supported_ratios and request.ratio not in c.supported_ratios:
             continue
