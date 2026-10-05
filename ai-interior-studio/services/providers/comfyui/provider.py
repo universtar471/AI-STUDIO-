@@ -192,7 +192,10 @@ class ComfyUIProvider:
                         uploaded.append('/'.join(filter(None, [upload.get('subfolder', ''), upload['name']])))
                     while True:
                         extra['attempts'] += 1
-                        graph = inject(template, manifest, source_image=uploaded[0], reference_image=uploaded[1:],
+                        # Empty reference slots repeat the base view: a template default would point at a
+                        # stale or missing file in ComfyUI's input folder.
+                        references = uploaded[1:] + [uploaded[0]] * (manifest.max_reference_images - len(uploaded) + 1)
+                        graph = inject(template, manifest, source_image=uploaded[0], reference_image=references,
                                        prompt=record['prompt'], seed=record['seed'], filename_prefix=record['filename_prefix'], preset=extra['preset'])
                         try:
                             run.outputs = await self._attempt(client, run, graph, record)

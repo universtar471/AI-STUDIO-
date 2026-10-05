@@ -265,3 +265,16 @@ def test_progress_is_visible_and_other_jobs_are_ignored():
         await p.cancel(job.provider_job_id)
         assert not fake.connected
     asyncio.run(scenario())
+
+
+def test_unused_reference_slots_reuse_the_base_upload():
+    # A template default filename would be a stale or missing image in ComfyUI.
+    async def scenario():
+        fake = Fake()
+        p = ComfyUIProvider(Images(), config=config(), transport=httpx.MockTransport(fake.http), ws_connect=fake.websocket)
+        job = await p.submit(RenderRequest(project_id='p', mode='sketchup_render', source={'artifact_id': 'base'}, prompt={'raw_text': 'x'}))
+        assert (await finish(p, job)).state == 'succeeded'
+        graph = fake.graphs[0]['1']['inputs']
+        assert graph['ref'] == graph['source'] == 'studio/1.png'
+        assert len(fake.uploads) == 1
+    asyncio.run(scenario())
