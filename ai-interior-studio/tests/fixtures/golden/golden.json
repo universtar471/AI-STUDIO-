@@ -1,19 +1,29 @@
 {
-  "version": 1,
-  "note": "Images are the owner's and are not committed (public repo). Put them under data/golden/ (or pass --golden-dir); sha256 pins the exact files.",
+  "version": 2,
+  "note": "Images are the owner's and are not committed (public repo). Put them under data/golden/ (or pass --golden-dir); sha256 pins the exact files. v2: five views of one bedroom are the golden set; STYLE_MASTER is a material board because Klein copies furniture out of a full-room master (G2).",
   "required_scenes": 5,
   "seed": 7,
   "style_pack": {
     "name": "Japandi",
     "palette": ["#E8DFD3", "#C9B49A", "#8C6F56", "#4A3B30"],
     "references": [
-      {"file": "style/master_kitchen.jpg", "role": "STYLE_MASTER", "sha256": "da36d3e7ed30698999aaecf30c4d359d55036d746a575a6f9f883099ae49c0ce", "source_note": "D:/JAPANDI/a5fbbe33dbce54205079787d7b4ea6dc.jpg"},
-      {"file": "style/kitchen_collage.jpg", "role": "CABINET", "sha256": "f2f70165827686bf0f775831743700e8673483b31af0e5adfd6eff36aa719068", "source_note": "D:/JAPANDI/tai xuong (1).jpg"},
-      {"file": "style/material_board.jpg", "role": "FLOOR", "sha256": "506d53672b44d8895b245493f47790850a7d1c6b5b3b4e9338b2ca0dfce1aea3", "source_note": "D:/JAPANDI/af27dc02e457f435015cc5756027ab42.jpg"},
-      {"file": "style/palette_board.jpg", "role": "DECOR", "sha256": "cc93cfd1197b146b8ead455d8b14407487e5fab7ac14055d54287a35c3138c6b", "source_note": "D:/JAPANDI/75194552d0fe363ccff678a18f87a642.jpg"}
+      {"file": "style/material_board.jpg", "role": "STYLE_MASTER", "sha256": "506d53672b44d8895b245493f47790850a7d1c6b5b3b4e9338b2ca0dfce1aea3", "source_note": "D:/JAPANDI/af27dc02e457f435015cc5756027ab42.jpg"},
+      {"file": "style/bedroom_moodboard.jpg", "role": "FURNITURE", "sha256": "55718d9f9f95edbf853d163f0d9c35ee77e587b25afb8ba8e4e0e57879af68be", "source_note": "D:/JAPANDI/4ceb91ca3226169d874e1cc3a43eaa21.jpg"},
+      {"file": "style/palette_board.jpg", "role": "DECOR", "sha256": "cc93cfd1197b146b8ead455d8b14407487e5fab7ac14055d54287a35c3138c6b", "source_note": "D:/JAPANDI/75194552d0fe363ccff678a18f87a642.jpg"},
+      {"file": "style/kitchen_collage.jpg", "role": "DECOR", "sha256": "f2f70165827686bf0f775831743700e8673483b31af0e5adfd6eff36aa719068", "source_note": "D:/JAPANDI/tai xuong (1).jpg"}
     ]
   },
   "scenes": [
+    {"id": "bedroom_1", "name": "Bedroom wide", "file": "scenes/bedroom_1.jpg", "sha256": "6f8b2ca1fd04a1d7fa5ff6e39ebd9d2a015cdad0b8b4be455b1650eeac1bf74e",
+     "must_keep": ["camera", "two beds on the low platform", "textured stone panel between dark wood panels", "travertine headboard band with switches", "sliding glass door and sheer curtains", "white armchair", "round coffee tables", "channel-tufted sofa"]},
+    {"id": "bedroom_2", "name": "Bedroom frontal", "file": "scenes/bedroom_2.jpg", "sha256": "e72832e5d4057148728e059ff4e0227f9ec9a64e1092f22fd08ab6ca3c0a46cb",
+     "must_keep": ["camera (centred, frontal)", "two beds with brown throws", "stone panel and dark wood panels", "floating nightstand with books", "sliding glass door on the right"]},
+    {"id": "bedroom_3", "name": "Bedroom vanity", "file": "scenes/bedroom_3.jpg", "sha256": "8946650bf285abfd6933c9b928804bd2d7bed54dd86f8fcf475bab8c59c3489d",
+     "must_keep": ["camera", "travertine double vanity", "glass partition with frosted panel", "oak wardrobe", "walnut cabinet", "bed with throw", "textured stone wall"]},
+    {"id": "bedroom_4", "name": "Bedroom lounge", "file": "scenes/bedroom_4.jpg", "sha256": "6a670a1e934473555fe2dfb5bc3189e3abb9a17bd52a7f8449d8e31fd0b92f72",
+     "must_keep": ["camera", "sofa along the window", "two coffee tables", "white armchair", "walnut sideboard", "wall air conditioner", "framed artwork", "door", "bed in the foreground"]},
+    {"id": "bedroom_5", "name": "Bedroom entry", "file": "scenes/bedroom_5.jpg", "sha256": "d7f603a5a3788816cafedc50e30540f5a9adf3b832dec39ffd21f50f34fea60e",
+     "must_keep": ["camera", "wall air conditioner", "framed artwork", "walnut sideboard", "travertine vanity", "glass partition", "abstract painting behind the vanity", "wardrobe", "window blinds"]},
     {"id": "kitchen_arches", "name": "Kitchen arches", "file": "scenes/kitchen_arches.jpg", "sha256": "3ccc3268ec76703a1a3f54320af8c02455a08bee7bafcfcaa02603eb265b6961",
      "must_keep": ["camera", "three arched windows", "island with two stools", "two rattan pendants", "oven column", "arched doorway"]},
     {"id": "kitchen_beams", "name": "Kitchen beams", "file": "scenes/kitchen_beams.jpg", "sha256": "6b21c59d61ddbd3c383d9b220d0a57aab671b78197a13601fc06b9669810ab83",
