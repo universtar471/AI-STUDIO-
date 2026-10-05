@@ -1,6 +1,12 @@
 from __future__ import annotations
 
+import os
+
 import pytest
+
+# Never drive the real Google Flow account from tests: this machine has a signed-in browser profile.
+# Set before any app is created; integration backends inherit it through the environment.
+os.environ['AI_STUDIO_DISABLE_FLOW'] = '1'
 
 from services.core.domain import RenderMode, RenderRequest, SourceRef
 from services.core.storage import Database, DataRoot

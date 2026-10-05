@@ -19,6 +19,7 @@ from services.core.orchestration import JobManager, OrchestrationError, provider
 from services.core.storage import DataRoot, Database
 from services.providers.comfyui.config import load_config
 from services.providers.comfyui.provider import ComfyUIProvider
+from services.providers.flow import FlowProvider
 from services.providers.gemini import GeminiImageProvider, StorageImageSource
 from services.providers.mock import MockProvider
 from .schemas import FinalizeRequest, HealthResponse, ProjectCreate, ProviderInfo, StylePackCreate
@@ -62,8 +63,12 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
     app = FastAPI(title='AI Interior Studio API', version='0.1.0', lifespan=lifespan)
     if providers is None:
         adapters.append(ComfyUIProvider(_ManagerImages(app), config=load_config()))
-        # Cloud path is optional: without a key it reports unavailable and is skipped.
-        adapters.append(GeminiImageProvider(_ManagerImages(app), usage_path=root.root / 'cache' / 'gemini_usage.json'))
+        # Cloud path: the user's signed-in Google Flow in a browser (no API cost). Tests switch it off.
+        if os.environ.get('AI_STUDIO_DISABLE_FLOW') != '1':
+            adapters.append(FlowProvider(_ManagerImages(app), data_root=root.root))
+        # Paid Gemini API: kept, but only when asked for.
+        if os.environ.get('AI_STUDIO_ENABLE_GEMINI_API') == '1':
+            adapters.append(GeminiImageProvider(_ManagerImages(app), usage_path=root.root / 'cache' / 'gemini_usage.json'))
         # Synthetic images are for development and tests only; real providers come first when enabled.
         if os.environ.get('AI_STUDIO_ENABLE_MOCK') == '1':
             adapters.append(MockProvider())

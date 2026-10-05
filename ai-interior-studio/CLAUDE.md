@@ -21,7 +21,7 @@ App Windows cho một người dùng: render nội thất từ SketchUp (Mode A)
 A1 Nền tảng đã xong (155 test xanh). `docs/contracts.md` đã duyệt 05/10/2026. A2 API & Job đã xong và merge. A9 chạy cổng G1: đề xuất ĐẠT (`docs/gates/G1.md`, 180 test xanh). G1 đã duyệt 05/10/2026. Đợt 2: A4, A5, A6 xong; A3 và cổng G2 chờ Đợt 0. Xem `docs/status.md`.
 
 Giao diện: `apps/web` (`npm run dev`, cần backend `python -m services.api`).
-Provider mặc định: ComfyUI (`AI_STUDIO_COMFYUI_CONFIG` trỏ file JSON nếu không dùng `http://127.0.0.1:8188`) và Gemini (cần key). Provider mock chỉ bật khi `AI_STUDIO_ENABLE_MOCK=1` (thử giao diện không tốn GPU/tiền). Timeout job: `AI_STUDIO_JOB_TIMEOUT_S` (mặc định 600).
+Provider mặc định: ComfyUI (`AI_STUDIO_COMFYUI_CONFIG` trỏ file JSON nếu không dùng `http://127.0.0.1:8188`) và Google Flow (tài khoản Google đã đăng nhập, không tốn tiền). Flow chạy qua driver Node của plugin SketchUp TB Gemini Render (`node run.js <jobDir>`, đường dẫn lấy từ `installation.json` của plugin; profile Chrome `%LOCALAPPDATA%\TBGeminiRender\chrome-profile`, đăng nhập bằng `login.js` của driver). App chỉ ghi thư mục job v3 vào `<data>/flow-jobs/` và đọc kết quả; sửa tự động hoá Flow thì sửa ở driver, không viết lại trong app. Tắt Flow: `AI_STUDIO_DISABLE_FLOW=1` (test đặt sẵn); cấu hình: `AI_STUDIO_FLOW_CONFIG`. Gemini API (tốn tiền) chỉ bật khi `AI_STUDIO_ENABLE_GEMINI_API=1` và có key. Provider mock chỉ bật khi `AI_STUDIO_ENABLE_MOCK=1` (thử giao diện không tốn GPU/tiền). Timeout job: `AI_STUDIO_JOB_TIMEOUT_S` (mặc định 600).
 
 ## Lệnh
 

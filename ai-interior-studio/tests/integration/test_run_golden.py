@@ -79,6 +79,18 @@ def test_two_runs_write_report_against_previous_run(golden, tmp_path):
     assert 'chưa có' in first_report
 
 
+def test_seed_is_left_out_for_providers_without_seed(golden, tmp_path):
+    root, manifest = golden
+    mock = MockProvider(delay=.01)
+    mock.capabilities = mock.capabilities.model_copy(update={'supports_seed': False})
+    app = create_app(tmp_path / 'data', providers=[mock], poll_interval=.001)
+    with TestClient(app) as client:
+        run_golden(client, provider='mock', golden_dir=root, out_root=tmp_path / 'runs', timeout_s=10, poll_s=.01,
+                   manifest_path=manifest, log=lambda _: None)
+        jobs = client.get('/render/jobs').json()
+    assert jobs and all(j['state'] == 'REVIEW' and j['request']['seed'] is None for j in jobs)
+
+
 def test_unknown_provider_fails_before_creating_anything(golden, tmp_path):
     root, manifest = golden
     app = create_app(tmp_path / 'data', providers=[MockProvider(delay=.01)], poll_interval=.001)

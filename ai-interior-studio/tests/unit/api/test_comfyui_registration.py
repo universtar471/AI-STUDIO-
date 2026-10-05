@@ -27,7 +27,7 @@ def test_default_providers_offline_comfyui_and_storage_images(tmp_path, monkeypa
     with TestClient(app) as client:
         response = client.get('/providers')
         assert response.status_code == 200
-        assert [p['id'] for p in response.json()] == ['comfyui', 'gemini', 'mock']
+        assert [p['id'] for p in response.json()] == ['comfyui', 'mock']
         assert response.json()[0]['health']['status'] == 'unavailable'
         comfy = app.state.manager.providers[0]
         assert comfy.config.url == 'http://comfy.invalid:9999'
