@@ -1,6 +1,6 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2, kiểm cổng G2** (`docs/gates/G2.md`): phần chức năng ĐẠT (giao diện → ComfyUI thật → duyệt; tắt ComfyUI app vẫn chạy). Golden đủ 5 cảnh phòng ngủ + 2 bếp; chạy 7/7 qua ComfyUI (`data/golden-runs/20261005-144413-comfyui`) và 7/7 qua Google Flow (`data/golden-runs/20261005-151331-flow`). **G0 và G2 chờ chủ dự án chấm hai `report.html`.** 284 test Python xanh. Render cloud chuyển từ Gemini API (trả tiền, nay tắt mặc định) sang Google Flow qua driver Node của plugin TB Gemini Render. Đã sửa các ghi nhận G2: huỷ job gửi `/interrupt` sang ComfyUI, health kiểm lại khi mất kết nối, cảnh báo VRAM thấp (DEGRADED), mock chỉ bật bằng `AI_STUDIO_ENABLE_MOCK=1`.
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2, kiểm cổng G2** (`docs/gates/G2.md`): phần chức năng ĐẠT (giao diện → ComfyUI thật → duyệt; tắt ComfyUI app vẫn chạy). Golden đủ 5 cảnh phòng ngủ + 2 bếp; chạy 7/7 qua ComfyUI (`data/golden-runs/20261005-144413-comfyui`) và 7/7 qua Google Flow (`data/golden-runs/20261005-151331-flow`). **G0 và G2 ĐẠT — chủ dự án duyệt 05/10/2026.** Đợt 3 được mở. 284 test Python xanh. Render cloud chuyển từ Gemini API (trả tiền, nay tắt mặc định) sang Google Flow qua driver Node của plugin TB Gemini Render. Đã sửa các ghi nhận G2: huỷ job gửi `/interrupt` sang ComfyUI, health kiểm lại khi mất kết nối, cảnh báo VRAM thấp (DEGRADED), mock chỉ bật bằng `AI_STUDIO_ENABLE_MOCK=1`.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
@@ -17,7 +17,6 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2, kiểm cổng G2** (`d
 ## Đề bài đang mở
 
 - A0 nối A5 vào orchestrator + NÊN SỬA A2: xong, merge (218 test).
-- G0/G2: chủ dự án chấm `report.html` của hai lượt golden (ComfyUI, Flow).
 - Còn mở trước Đợt 3: thống nhất cỡ ảnh 1024/1536 với 1K/2K/4K (cần đề xuất hợp đồng). Gemini API giữ code, tắt mặc định (`AI_STUDIO_ENABLE_GEMINI_API=1`).
 
 Đã đóng: A4, A5, A6 (đề bài, note, review trong `docs/agent-*`). A0 thêm vào API: đăng ký Gemini, `GET /projects/{id}/scenes`, `GET /style-packs/{id}/versions`. A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
