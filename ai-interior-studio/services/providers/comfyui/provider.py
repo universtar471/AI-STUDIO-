@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 import hashlib
 import json
+import math
 import secrets
 import time
 from typing import Protocol
@@ -40,6 +42,7 @@ class _Run:
         self.task = None
         self.status = ProviderStatus(state=ProviderJobState.QUEUED)
         self.outputs = []
+        self.prompt_id = None
 
 
 class ComfyUIProvider:
@@ -116,6 +119,10 @@ class ComfyUIProvider:
                         found = name in [str(v).replace('\\', '/') for v in choices]
                     if not found:
                         missing.append(f'Missing model (object_info): {model.path}')
+            if not missing:
+                warning = await self._vram_warning()
+                if warning:
+                    return ProviderHealth(status=HealthStatus.DEGRADED, detail=warning)
             return ProviderHealth(status=HealthStatus.UNAVAILABLE if missing else HealthStatus.OK,
                                   detail='; '.join(missing) if missing else 'ComfyUI workflow ready')
         except (OSError, ValueError) as exc:
@@ -124,6 +131,47 @@ class ComfyUIProvider:
             return ProviderHealth(status=HealthStatus.UNAVAILABLE, detail='ComfyUI offline or HTTP endpoint unavailable')
         except (KeyError, TypeError):
             return ProviderHealth(status=HealthStatus.UNAVAILABLE, detail='Invalid ComfyUI object_info or template')
+
+    async def _vram_warning(self):
+        try:
+            async with self._client() as client:
+                response = await client.get('system_stats')
+                response.raise_for_status()
+                device = response.json()['devices'][0]
+                free = device['vram_free']
+                if type(free) not in (int, float) or not math.isfinite(free) or free < 0:
+                    return None
+                torch_total = device.get('torch_vram_total')
+                available = free
+                if type(torch_total) in (int, float) and math.isfinite(torch_total) and torch_total >= 0:
+                    available += torch_total
+                available_mb = available / (1024 * 1024)
+                if available_mb >= self.config.min_free_vram_mb:
+                    return None
+                response = await client.get('queue')
+                response.raise_for_status()
+                queue = response.json()
+                if queue['queue_running'] == [] and queue['queue_pending'] == []:
+                    return f'VRAM khả dụng {available_mb:.0f} MB; hãy đóng ứng dụng khác đang dùng GPU.'
+        except (httpx.HTTPError, ValueError, KeyError, TypeError, IndexError, OverflowError):
+            pass  # Older servers and unknown stats formats do not block the workflow.
+        return None
+
+    def _invalidate_health(self):
+        self._health_cached = None
+        self._health_expires_at = 0.0
+
+    @asynccontextmanager
+    async def _socket(self, url):
+        opened = False
+        try:
+            async with self._ws_connect(url, open_timeout=self.config.timeout_s) as ws:
+                opened = True
+                yield ws
+        except Exception:
+            if not opened:
+                self._invalidate_health()
+            raise
 
     def _preset(self, request):
         if request.image_size:
@@ -177,6 +225,30 @@ class ComfyUIProvider:
                 await run.task
             except asyncio.CancelledError:
                 pass
+            await self._cancel_prompt(run)
+
+    async def _cancel_prompt(self, run):
+        if run.prompt_id is None:
+            return
+        try:
+            # Cancellation must remain bounded even if the server stops responding.
+            async with asyncio.timeout(min(5, self.config.timeout_s)), self._client() as client:
+                response = await client.get('queue')
+                response.raise_for_status()
+                queue = response.json()
+                def contains(entries):
+                    return any(isinstance(entry, list) and len(entry) > 1 and entry[1] == run.prompt_id
+                               for entry in entries)
+                if contains(queue['queue_running']):
+                    # ComfyUI has no interrupt-by-ID: another prompt may start between
+                    # the queue snapshot and this server-wide interrupt.
+                    response = await client.post('interrupt', json={})
+                    response.raise_for_status()
+                elif contains(queue['queue_pending']):
+                    response = await client.post('queue', json={'delete': [run.prompt_id]})
+                    response.raise_for_status()
+        except (httpx.HTTPError, TimeoutError, ValueError, KeyError, TypeError):
+            pass  # Local cancellation succeeds even when remote cleanup is unavailable.
 
     async def fetch_result(self, provider_job_id):
         run = self._runs[provider_job_id]
@@ -225,6 +297,8 @@ class ComfyUIProvider:
             run.status = ProviderStatus(state=ProviderJobState.CANCELLED, metrics=metrics())
             raise
         except Exception as exc:
+            if isinstance(exc, (httpx.ConnectError, httpx.ConnectTimeout)):
+                self._invalidate_health()
             code = 'COMFYUI_ERROR'
             if isinstance(exc, ExecutionError):
                 code = 'COMFYUI_OUT_OF_MEMORY' if exc.oom else 'COMFYUI_EXECUTION_ERROR'
@@ -236,10 +310,12 @@ class ComfyUIProvider:
     async def _attempt(self, client, run, graph, record):
         client_id = new_id()
         ws_url = self.config.url.replace('http:', 'ws:', 1).replace('https:', 'wss:', 1) + '/ws?clientId=' + client_id
-        async with self._ws_connect(ws_url, open_timeout=self.config.timeout_s) as ws:
+        run.prompt_id = None
+        async with self._socket(ws_url) as ws:
             response = await client.post('prompt', json={'prompt': graph, 'client_id': client_id})
             response.raise_for_status()
             prompt_id = response.json()['prompt_id']
+            run.prompt_id = prompt_id
             while True:
                 raw = await ws.recv()
                 if isinstance(raw, bytes):

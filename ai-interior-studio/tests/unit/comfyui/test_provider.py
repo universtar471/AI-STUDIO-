@@ -15,6 +15,109 @@ from services.providers.comfyui.provider import ComfyUIProvider
 FIXTURES = Path(__file__).parent / 'fixtures'
 
 
+@pytest.mark.parametrize('location', ['running', 'pending', 'other', 'offline', 'post_failure'])
+def test_remote_cancel(location):
+    async def scenario():
+        fake = Fake()
+        fake.hold = True
+        writes = []
+        async def endpoint(req):
+            if req.url.path == '/queue' and req.method == 'GET':
+                if location == 'offline':
+                    raise httpx.ReadTimeout('private details')
+                return httpx.Response(200, json={
+                    'queue_running': [[0, '1' if location in ('running', 'post_failure') else 'other']],
+                    'queue_pending': [[1, '1']] if location == 'pending' else []})
+            if req.method == 'POST' and req.url.path in ('/interrupt', '/queue'):
+                writes.append((req.url.path, json.loads(req.content)))
+                if location == 'post_failure':
+                    raise httpx.ConnectError('private details')
+                return httpx.Response(200, json={})
+            return await fake.http(req)
+        p = ComfyUIProvider(Images(), config=config(), transport=httpx.MockTransport(endpoint), ws_connect=fake.websocket)
+        job = await p.submit(request())
+        for _ in range(100):
+            if (await p.poll(job.provider_job_id)).progress == .5:
+                break
+            await asyncio.sleep(.001)
+        assert fake.graphs
+        await p.cancel(job.provider_job_id)
+        await p.cancel(job.provider_job_id)
+        assert (await p.poll(job.provider_job_id)).state == 'cancelled'
+        expected = [('/interrupt', {})] if location in ('running', 'post_failure') else [('/queue', {'delete': ['1']})] if location == 'pending' else []
+        assert writes == expected
+        assert not fake.connected
+    asyncio.run(scenario())
+
+
+@pytest.mark.parametrize('failure', ['connect', 'connect_timeout', 'websocket'])
+def test_execution_invalidates_health(failure):
+    async def scenario():
+        fake = Fake()
+        async def endpoint(req):
+            if req.url.path == '/upload/image' and failure != 'websocket':
+                error = httpx.ConnectError if failure == 'connect' else httpx.ConnectTimeout
+                raise error('private details')
+            return await fake.http(req)
+        @asynccontextmanager
+        async def broken_ws(*args, **kwargs):
+            raise OSError('private details')
+            yield
+        p = ComfyUIProvider(Images(), config=config(), transport=httpx.MockTransport(endpoint), ws_connect=broken_ws)
+        assert (await p.health()).status == 'ok'
+        assert (await finish(p, await p.submit(request()))).state == 'failed'
+        assert (await p.health()).status == 'ok'
+        assert fake.calls.count('/object_info') == 2
+    asyncio.run(scenario())
+
+
+@pytest.mark.parametrize('free,running,threshold,expected', [
+    (1024, [], 6000, 'degraded'), (1024, [[0, 'other']], 6000, 'ok'),
+    (6000, [], 6000, 'ok'), (1024, [], 512, 'ok'),
+    (None, [], 6000, 'ok'), ('unknown', [], 6000, 'ok'), (-1, [], 6000, 'ok'),
+])
+def test_vram_preflight(free, running, threshold, expected):
+    async def scenario():
+        fake = Fake()
+        async def endpoint(req):
+            if req.url.path == '/system_stats':
+                value = free * 1024 * 1024 if isinstance(free, int) else free
+                return httpx.Response(404) if free is None else httpx.Response(200, json={'devices': [{'vram_free': value}]})
+            if req.url.path == '/queue':
+                return httpx.Response(200, json={'queue_running': running, 'queue_pending': []})
+            return await fake.http(req)
+        p = ComfyUIProvider(Images(), config=config(min_free_vram_mb=threshold), transport=httpx.MockTransport(endpoint))
+        health = await p.health()
+        assert health.status == expected
+        if expected == 'degraded':
+            assert '1024 MB' in health.detail and 'GPU' in health.detail
+    asyncio.run(scenario())
+
+
+@pytest.mark.parametrize('free_mb,torch_mb,expected', [
+    (2000, 6000, 'ok'),
+    (1000, 0, 'degraded'),
+])
+def test_vram_preflight_counts_reclaimable_torch_memory(free_mb, torch_mb, expected):
+    async def scenario():
+        fake = Fake()
+        async def endpoint(req):
+            if req.url.path == '/system_stats':
+                return httpx.Response(200, json={'devices': [{
+                    'vram_free': free_mb * 1024 * 1024,
+                    'torch_vram_total': torch_mb * 1024 * 1024,
+                }]})
+            if req.url.path == '/queue':
+                return httpx.Response(200, json={'queue_running': [], 'queue_pending': []})
+            return await fake.http(req)
+        p = ComfyUIProvider(Images(), config=config(), transport=httpx.MockTransport(endpoint))
+        health = await p.health()
+        assert health.status == expected
+        if expected == 'degraded':
+            assert f'{free_mb + torch_mb} MB' in health.detail
+    asyncio.run(scenario())
+
+
 class Images:
     def base_image(self, request):
         return 'base', b'base-bytes', 'image/png'
@@ -37,6 +140,10 @@ class Fake:
         self.calls.append(path)
         if path == '/object_info':
             return httpx.Response(200, json=self.info)
+        if path == '/system_stats':
+            return httpx.Response(404)
+        if path == '/queue':
+            return httpx.Response(200, json={'queue_running': [], 'queue_pending': []})
         if path == '/upload/image':
             self.uploads.append(await request.aread())
             return httpx.Response(200, json={'name': f'{len(self.uploads)}.png', 'subfolder': 'studio', 'type': 'input'})
@@ -227,7 +334,7 @@ def test_connection_failure_cache_recovers_after_five_seconds(monkeypatch):
         assert len(calls) == 1
         now[0] += .1
         assert (await p.health()).status == 'ok'
-        assert len(calls) == 2
+        assert calls.count('/object_info') == 2
     asyncio.run(scenario())
 
 
