@@ -17,13 +17,15 @@ from services.core.domain import (
 )
 from services.core.orchestration import JobManager, OrchestrationError, provider_health
 from services.core.storage import DataRoot, Database
+from services.providers.comfyui.config import load_config
+from services.providers.comfyui.provider import ComfyUIProvider
 from services.providers.gemini import GeminiImageProvider, StorageImageSource
 from services.providers.mock import MockProvider
 from .schemas import FinalizeRequest, HealthResponse, ProjectCreate, ProviderInfo, StylePackCreate
 
 
 class _ManagerImages:
-    """Gemini reads input images through the running app's database, which only exists after startup."""
+    """Providers read images through the app's database, which only exists after startup."""
 
     def __init__(self, app: FastAPI):
         self.app = app
@@ -39,7 +41,9 @@ class _ManagerImages:
         return self._source().image(artifact_id)
 
 
-def create_app(data_root: Path | str | None = None, *, providers: list[ImageProvider] | None = None, timeout: float = 120, poll_interval: float = .1) -> FastAPI:
+def create_app(data_root: Path | str | None = None, *, providers: list[ImageProvider] | None = None, timeout: float | None = None, poll_interval: float = .1) -> FastAPI:
+    if timeout is None:
+        timeout = float(os.environ.get('AI_STUDIO_JOB_TIMEOUT_S', '600'))
     root = DataRoot(Path(data_root or os.environ.get('AI_STUDIO_DATA_ROOT', Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'AIInteriorStudio')))
     adapters: list[ImageProvider] = providers if providers is not None else [MockProvider()]
 
@@ -57,6 +61,7 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
 
     app = FastAPI(title='AI Interior Studio API', version='0.1.0', lifespan=lifespan)
     if providers is None:
+        adapters.append(ComfyUIProvider(_ManagerImages(app), config=load_config()))
         # Cloud path is optional: without a key it reports unavailable and is skipped.
         adapters.append(GeminiImageProvider(_ManagerImages(app), usage_path=root.root / 'cache' / 'gemini_usage.json'))
 

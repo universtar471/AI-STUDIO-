@@ -52,6 +52,9 @@ class ComfyUIProvider:
         self._transport, self._ws_connect = transport, ws_connect
         self._runs: dict[str, _Run] = {}
         self._queue = asyncio.Lock()
+        self._health_lock = asyncio.Lock()
+        self._health_cached: ProviderHealth | None = None
+        self._health_expires_at = 0.0
         self.capabilities = ProviderCapabilities(
             supported_modes=[RenderMode.SKETCHUP_RENDER, RenderMode.IMAGE_EDIT],
             supports_multi_reference=True, supports_seed=True, supports_local=True,
@@ -68,6 +71,19 @@ class ComfyUIProvider:
                                  timeout=self.config.timeout_s, trust_env=False)
 
     async def health(self) -> ProviderHealth:
+        async with self._health_lock:
+            if self._health_cached is not None and time.monotonic() < self._health_expires_at:
+                return self._health_cached
+            result = await self._preflight()
+            ttl = self.config.health_cache_ttl_s
+            # Retry unavailable endpoints quickly when the local service starts.
+            if result.status != HealthStatus.OK:
+                ttl = min(ttl, 5)
+            self._health_cached = result
+            self._health_expires_at = time.monotonic() + ttl
+            return result
+
+    async def _preflight(self) -> ProviderHealth:
         try:
             manifest, template, _ = load_workflow(self.config)
             async with self._client() as client:
