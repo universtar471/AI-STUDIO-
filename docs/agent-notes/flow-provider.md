@@ -7,7 +7,8 @@ tái dùng driver Flow đã chạy ổn của plugin SketchUp TB Gemini Render t
 ## Đã xong
 - `services/providers/flow/`:
   - `driver.py` — `NodeFlowDriver`: ghi job v3 (request.json, source.png cắt đúng tỷ lệ Flow, prompt.txt, 1 STYLE_REF),
-    chạy `node run.js <jobDir>`, theo dõi `status.json`, đọc `results.json`, nhớ `flow_project_url` để dùng lại một project.
+    chạy `node run.js <jobDir>`, theo dõi `status.json`, đọc `results.json`. Mỗi job một project Flow mới (như plugin);
+    ghim một project bằng `project_url` trong config.
   - `provider.py` — `FlowProvider` (id `flow`): 1 ảnh tham chiếu (slot STYLE_REF), không seed, không tốn tiền, chạy tuần tự.
   - `config.py` — đường dẫn node/run.js từ `installation.json` của plugin, ghi đè bằng `AI_STUDIO_FLOW_CONFIG`.
 - `services/api/app.py`: thứ tự comfyui → flow (tắt bằng `AI_STUDIO_DISABLE_FLOW=1`) → gemini (chỉ khi
@@ -17,7 +18,9 @@ tái dùng driver Flow đã chạy ổn của plugin SketchUp TB Gemini Render t
 
 ## Kiểm chứng
 - `python -m pytest -q` — 284 passed. Test Flow dùng run.js giả, không bao giờ chạm tài khoản thật.
-- Chạy thật 1 cảnh (bedroom_2 + material board): 85 s, ảnh 2752×1536, giữ bố cục.
+- Golden 7 cảnh qua API `--provider flow`: 7/7 REVIEW, 74–192 s/cảnh, 2752×1536, giữ hình khối + camera
+  (`data/golden-runs/20261005-151331-flow`). Material board ghi đè màu gốc (đúng vai STYLE_REF); ảnh có dấu ✦ Gemini góc phải dưới.
+- Bẫy: dùng lại project Flow cũ → ảnh kết quả lần trước dính trong ô prompt → driver báo ảnh không khớp job.
 
 ## Còn nợ / cạm bẫy
 - Phụ thuộc plugin TB Gemini Render đã cài (driver + Node 24). Không có → health `unavailable`.
