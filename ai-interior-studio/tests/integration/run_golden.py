@@ -117,7 +117,9 @@ def run_golden(client: httpx.Client, *, provider: str, golden_dir: Path, out_roo
         shutil.copyfile(source, run_dir / f"{scene_spec['id']}_source{source.suffix.lower()}")
         scene = _check(client.post(f"/projects/{project['id']}/scenes/import", data={'name': scene_spec['name']}, files={'file': _upload(source)}))
         request = {'project_id': project['id'], 'mode': 'sketchup_render', 'source': {'scene_id': scene['id']}, 'provider_id': provider,
-                   'style_pack_id': pack['id'], 'seed': manifest.get('seed')}
+                   'style_pack_id': pack['id']}
+        if providers[provider]['capabilities']['supports_seed']:  # e.g. Google Flow has no seed setting
+            request['seed'] = manifest.get('seed')
         if size:
             request['image_size'] = size
         t0 = time.monotonic()
