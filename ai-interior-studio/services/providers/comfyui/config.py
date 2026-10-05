@@ -20,6 +20,7 @@ class ComfyUIConfig(BaseModel):
     models_dir: Path | None = None
     timeout_s: float = Field(default=600, gt=0)
     health_cache_ttl_s: float = Field(default=30, ge=0)
+    min_free_vram_mb: float = Field(default=6000, ge=0, allow_inf_nan=False)
 
     @field_validator('url')
     @classmethod
