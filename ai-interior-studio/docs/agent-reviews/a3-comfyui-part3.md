@@ -2,7 +2,11 @@
 
 Người duyệt: A0 (Claude), 05/10/2026. Bản duyệt: thay đổi chưa commit của Codex (268 test xanh theo note).
 
-## Kết luận: PHẢI SỬA 1 mục rồi merge
+## Kết luận: ĐẠT (vòng 2)
+
+Vòng 2: Codex sửa mục PHẢI SỬA (`available = vram_free + torch_vram_total`, 2 test mới) và thêm chú thích race cho NÊN SỬA #1; 270 test xanh. A0 kiểm `health()` trên ComfyUI thật: ngưỡng 6000 MB → ok, ngưỡng 20000 MB → degraded. NÊN SỬA #2 còn mở.
+
+## Vòng 1: PHẢI SỬA 1 mục
 
 Huỷ từ xa theo đúng `prompt_id`, timeout huỷ 5 s, xoá cache health khi lỗi kết nối: đúng đề bài, test đủ.
 
