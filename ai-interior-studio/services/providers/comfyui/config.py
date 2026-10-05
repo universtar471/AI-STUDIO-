@@ -7,16 +7,19 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
 
 class ComfyUIConfig(BaseModel):
     model_config = ConfigDict(extra='forbid', frozen=True)
 
     url: str = 'http://127.0.0.1:8188'
-    manifest_dir: Path = Path('workflows/manifests')
-    workflow_dir: Path = Path('workflows/comfyui')
-    manifest: str | None = None
+    manifest_dir: Path = PROJECT_ROOT / 'workflows/manifests'
+    workflow_dir: Path = PROJECT_ROOT / 'workflows/comfyui'
+    manifest: str | None = 'flux2_klein_4b_preview.json'
     models_dir: Path | None = None
-    timeout_s: float = Field(default=300, gt=0)
+    timeout_s: float = Field(default=600, gt=0)
+    health_cache_ttl_s: float = Field(default=30, ge=0)
 
     @field_validator('url')
     @classmethod

@@ -179,6 +179,58 @@ def test_config_environment(monkeypatch, tmp_path):
     assert load_config().url == 'http://localhost:9999'
 
 
+def test_default_config_is_independent_of_cwd(monkeypatch, tmp_path):
+    monkeypatch.delenv('AI_STUDIO_COMFYUI_CONFIG', raising=False)
+    monkeypatch.chdir(tmp_path)
+    cfg = load_config()
+    root = Path(__file__).resolve().parents[3]
+    assert cfg.manifest_dir == root / 'workflows/manifests'
+    assert cfg.workflow_dir == root / 'workflows/comfyui'
+    assert cfg.manifest == 'flux2_klein_4b_preview.json'
+    assert cfg.models_dir is None
+    assert cfg.timeout_s == 600
+    load_workflow(cfg)
+
+
+@pytest.mark.parametrize('ttl', [30, 12, 0])
+def test_health_cache_expiry(monkeypatch, ttl):
+    async def scenario():
+        now = [100.0]
+        monkeypatch.setattr('services.providers.comfyui.provider.time.monotonic', lambda: now[0])
+        fake = Fake()
+        cfg = config() if ttl == 30 else config(health_cache_ttl_s=ttl)
+        p = ComfyUIProvider(Images(), config=cfg, transport=httpx.MockTransport(fake.http))
+        assert (await p.health()).status == 'ok'
+        assert (await p.health()).status == 'ok'
+        assert fake.calls.count('/object_info') == (2 if ttl == 0 else 1)
+        now[0] += ttl
+        await p.health()
+        assert fake.calls.count('/object_info') == (3 if ttl == 0 else 2)
+    asyncio.run(scenario())
+
+
+def test_connection_failure_cache_recovers_after_five_seconds(monkeypatch):
+    async def scenario():
+        now = [100.0]
+        monkeypatch.setattr('services.providers.comfyui.provider.time.monotonic', lambda: now[0])
+        calls = []
+        fake = Fake()
+        async def endpoint(req):
+            calls.append(req.url.path)
+            if len(calls) == 1:
+                raise httpx.ConnectError('offline')
+            return await fake.http(req)
+        p = ComfyUIProvider(Images(), config=config(), transport=httpx.MockTransport(endpoint))
+        assert (await p.health()).status == 'unavailable'
+        now[0] += 4.9
+        assert (await p.health()).status == 'unavailable'
+        assert len(calls) == 1
+        now[0] += .1
+        assert (await p.health()).status == 'ok'
+        assert len(calls) == 2
+    asyncio.run(scenario())
+
+
 def test_timeout_and_cancel():
     async def scenario():
         fake = Fake()
@@ -206,7 +258,7 @@ def test_disk_models_hash_snapshot_and_changed_preset(tmp_path):
         manifest['models'][0]['sha256'] = checksum
         manifest['presets']['PREVIEW_QUALITY'].update(steps=23, cfg=4.5)
         (tmp_path / 'manifest.json').write_text(json.dumps(manifest))
-        cfg = ComfyUIConfig(manifest_dir=tmp_path, workflow_dir=FIXTURES, manifest='manifest.json', models_dir=model_dir)
+        cfg = ComfyUIConfig(manifest_dir=tmp_path, workflow_dir=FIXTURES, manifest='manifest.json', models_dir=model_dir, health_cache_ttl_s=0)
         fake = Fake()
         p = ComfyUIProvider(Images(), config=cfg, transport=httpx.MockTransport(fake.http), ws_connect=fake.websocket)
         assert (await p.health()).status == 'ok'
