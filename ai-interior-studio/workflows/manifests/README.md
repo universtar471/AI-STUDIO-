@@ -42,8 +42,8 @@ Bindings specify `{node_id, input}` for the six runtime variables: `source_image
 Two additional bindings, `steps` and `cfg`, apply values declared by each preset.
 Bindings must be distinct and exist in the template. No nodes or connections are generated.
 `max_reference_images` equals the number of reference bindings, excluding the base image.
-Unused reference slots retain their template defaults: the approved workflow must make those
-defaults valid and neutral for zero/fewer references. The adapter does not invent filler images.
+Unused reference slots receive the uploaded base image again (a template default would be a
+stale or missing file in ComfyUI). The adapter never invents filler images.
 
 Both presets are mandatory: `PREVIEW_FAST` has `long_edge=1024`, `PREVIEW_QUALITY` has
 `long_edge=1536`; both supply positive `steps` and nonnegative `cfg`.
