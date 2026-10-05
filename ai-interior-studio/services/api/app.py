@@ -45,7 +45,7 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
     if timeout is None:
         timeout = float(os.environ.get('AI_STUDIO_JOB_TIMEOUT_S', '600'))
     root = DataRoot(Path(data_root or os.environ.get('AI_STUDIO_DATA_ROOT', Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'AIInteriorStudio')))
-    adapters: list[ImageProvider] = providers if providers is not None else [MockProvider()]
+    adapters: list[ImageProvider] = providers if providers is not None else []
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -64,6 +64,9 @@ def create_app(data_root: Path | str | None = None, *, providers: list[ImageProv
         adapters.append(ComfyUIProvider(_ManagerImages(app), config=load_config()))
         # Cloud path is optional: without a key it reports unavailable and is skipped.
         adapters.append(GeminiImageProvider(_ManagerImages(app), usage_path=root.root / 'cache' / 'gemini_usage.json'))
+        # Synthetic images are for development and tests only; real providers come first when enabled.
+        if os.environ.get('AI_STUDIO_ENABLE_MOCK') == '1':
+            adapters.append(MockProvider())
 
     def manager() -> JobManager:
         return app.state.manager

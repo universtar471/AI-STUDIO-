@@ -22,12 +22,20 @@ def _free_port() -> int:
         return sock.getsockname()[1]
 
 
+def _offline_comfyui_config(data_root: Path) -> Path:
+    path = data_root.parent / 'comfyui-offline.json'
+    path.write_text('{"url": "http://127.0.0.1:9"}', encoding='utf-8')
+    return path
+
+
 class Backend:
     def __init__(self, data_root: Path, log_path: Path):
         self.data_root, self.log_path = data_root, log_path
         self.port = _free_port()
         self.url = f'http://127.0.0.1:{self.port}'
-        env = {**os.environ, 'AI_STUDIO_DATA_ROOT': str(data_root), 'GEMINI_API_KEY': FAKE_GEMINI_KEY, 'GOOGLE_API_KEY': FAKE_GEMINI_KEY}
+        env = {**os.environ, 'AI_STUDIO_DATA_ROOT': str(data_root), 'GEMINI_API_KEY': FAKE_GEMINI_KEY, 'GOOGLE_API_KEY': FAKE_GEMINI_KEY,
+               # Jobs run on the mock; ComfyUI points at a closed port so a real local ComfyUI is never used.
+               'AI_STUDIO_ENABLE_MOCK': '1', 'AI_STUDIO_COMFYUI_CONFIG': str(_offline_comfyui_config(data_root))}
         self._log = open(log_path, 'ab')
         self.process = subprocess.Popen(
             [sys.executable, '-m', 'uvicorn', 'services.api:create_app', '--factory', '--host', '127.0.0.1', '--port', str(self.port)],

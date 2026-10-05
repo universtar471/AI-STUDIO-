@@ -19,11 +19,23 @@ def offline_comfyui(monkeypatch):
         base_url=self.config.url, transport=httpx.MockTransport(offline)))
 
 
-def test_default_app_lists_mock_comfyui_and_gemini(tmp_path, monkeypatch):
+@pytest.mark.parametrize('flag,expected', [(None, ['comfyui', 'gemini']), ('0', ['comfyui', 'gemini']),
+                                           ('1', ['comfyui', 'gemini', 'mock'])])
+def test_mock_provider_only_with_flag(tmp_path, monkeypatch, flag, expected):
+    # Synthetic images must never answer a real AUTO request unless a developer asks for them.
+    monkeypatch.delenv('AI_STUDIO_ENABLE_MOCK', raising=False)
+    if flag is not None:
+        monkeypatch.setenv('AI_STUDIO_ENABLE_MOCK', flag)
+    with TestClient(create_app(tmp_path)) as client:
+        assert [p['id'] for p in client.get('/providers').json()] == expected
+
+
+def test_default_app_lists_comfyui_and_gemini(tmp_path, monkeypatch):
+    monkeypatch.delenv('AI_STUDIO_ENABLE_MOCK', raising=False)
     monkeypatch.setattr(gemini_module, 'get_secret', lambda name: None)
     with TestClient(create_app(tmp_path)) as client:
         providers = {p['id']: p for p in client.get('/providers').json()}
-        assert list(providers) == ['mock', 'comfyui', 'gemini']
+        assert list(providers) == ['comfyui', 'gemini']
         assert providers['gemini']['health']['status'] == 'unavailable'
         assert providers['gemini']['capabilities']['has_usage_cost'] is True
         project = client.post('/projects', json={'name': 'P'}).json()
