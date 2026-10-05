@@ -1,0 +1,26 @@
+{
+  "name": "flux2_klein_4b_preview",
+  "template": "flux2_klein_4b_preview.json",
+  "models": [
+    {"path": "diffusion_models/flux-2-klein-4b-fp8.safetensors", "object_info": {"class_type": "UNETLoader", "input": "unet_name"}},
+    {"path": "text_encoders/qwen_3_4b.safetensors", "object_info": {"class_type": "CLIPLoader", "input": "clip_name"}},
+    {"path": "vae/flux2-vae.safetensors", "object_info": {"class_type": "VAELoader", "input": "vae_name"}}
+  ],
+  "custom_nodes": [],
+  "bindings": {
+    "source_image": {"node_id": "1", "input": "image"},
+    "reference_image": [{"node_id": "2", "input": "image"}, {"node_id": "3", "input": "image"}],
+    "prompt": {"node_id": "30", "input": "text"},
+    "long_edge": {"node_id": "10", "input": "largest_size"},
+    "seed": {"node_id": "64", "input": "noise_seed"},
+    "filename_prefix": {"node_id": "70", "input": "filename_prefix"},
+    "steps": {"node_id": "62", "input": "steps"},
+    "cfg": {"node_id": "65", "input": "cfg"}
+  },
+  "presets": {
+    "PREVIEW_FAST": {"long_edge": 1024, "steps": 4, "cfg": 1.0},
+    "PREVIEW_QUALITY": {"long_edge": 1536, "steps": 4, "cfg": 1.0}
+  },
+  "max_reference_images": 2,
+  "license_note": "FLUX.2 [klein] 4B: Apache-2.0 (black-forest-labs/FLUX.2-klein-4b-fp8). Qwen3-4B text encoder and FLUX.2 VAE repackaged by Comfy-Org. Graph follows ComfyUI template image_flux2_klein_image_edit_4b_distilled (comfyui_workflow_templates 0.11.12)."
+}

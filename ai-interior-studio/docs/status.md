@@ -1,6 +1,6 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong và đã merge (213 test Python + 8 test web). **Cổng G2 chưa chạy được**: chờ Đợt 0 (workflow ComfyUI + 5 cảnh + Style Pack) để làm A3 và bộ ảnh chuẩn.
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong và đã merge (213 test Python + 8 test web). Đợt 0 phần kỹ thuật xong (`docs/gates/G0.md`): Klein 4B + SeedVR2 chạy thật trên 3060 qua `ComfyUIProvider`. **G0 và G2 chờ 3 cảnh SketchUp nữa** (đang có 2/5) và chủ dự án chấm.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
@@ -11,12 +11,13 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong v
 | A4 Gemini | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Chưa gọi Gemini thật lần nào |
 | A5 Prompt & Reference | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Orchestrator chưa dùng A5 (nối cùng A3) |
 | A6 Giao diện | 2 | Xong, review ĐẠT, merge (Claude làm); đã chạy tay trong trình duyệt; thêm URL dự án `#/projects/<id>` | đã xoá | Chưa có nút Loại (hợp đồng không có) |
-| Đợt 0 kiểm chứng tay | 0 | Chưa bắt đầu | - | Cần NGUYEN chạy trên máy có GPU |
+| Đợt 0 kiểm chứng tay | 0 | Kỹ thuật xong (A0): 2 workflow API JSON + manifest thật, preview 1024 ~30 s, 1536 ~60 s, SeedVR2 2048 ~30-50 s, VRAM < 10 GB; vá A3 NÊN SỬA #1 (ô tham chiếu trống dùng ảnh base) | `wt/wave0` | Còn 3/5 cảnh chuẩn; 1 lần lỗi driver GPU chưa rõ nguyên nhân (xem G0.md) |
 
 ## Đề bài đang mở
 
 - A0 nối A5 vào orchestrator + NÊN SỬA A2: xong, merge (218 test).
-- A9 Đợt 2 (bộ ảnh chuẩn, `run_golden`, cổng G2): chờ Đợt 0 và A3.
+- A9 Đợt 2 (bộ ảnh chuẩn, `run_golden`, cổng G2): chờ đủ 5 cảnh.
+- A3 phần 2: đăng ký `ComfyUIProvider` trong API trỏ manifest Klein; các mục NÊN SỬA còn lại.
 
 Đã đóng: A4, A5, A6 (đề bài, note, review trong `docs/agent-*`). A0 thêm vào API: đăng ký Gemini, `GET /projects/{id}/scenes`, `GET /style-packs/{id}/versions`. A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
 
