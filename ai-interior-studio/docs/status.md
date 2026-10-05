@@ -1,13 +1,13 @@
 # Trạng thái
 
-Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong và đã merge (213 test Python + 8 test web). Đợt 0 phần kỹ thuật xong (`docs/gates/G0.md`): Klein 4B + SeedVR2 chạy thật trên 3060 qua `ComfyUIProvider`. **G0 và G2 chờ 3 cảnh SketchUp nữa** (đang có 2/5) và chủ dự án chấm.
+Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2, kiểm cổng G2** (`docs/gates/G2.md`): phần chức năng ĐẠT (giao diện → ComfyUI thật → duyệt; tắt ComfyUI app vẫn chạy). **G0 và G2 chờ 3 cảnh SketchUp nữa (đang 2/5) và chủ dự án chấm ảnh.** 253 test Python xanh.
 
 | Agent | Đợt | Trạng thái | Nhánh | Vướng mắc |
 | --- | --- | --- | --- | --- |
 | A1 Nền tảng | 1 | Xong, 155 test xanh; `docs/contracts.md` đã duyệt 05/10/2026 | main | - |
 | A2 API & Job | 1 | Xong, review ĐẠT, đã merge `main` (175 test xanh) | đã xoá `wt/a2-api` | 4 mục NÊN SỬA trong `docs/agent-reviews/a2-api.md` chuyển cho A3/A4 |
-| A9 Kiểm thử | 1 | Xong Đợt 1: test tích hợp backend thật + G1 ĐẠT, đã merge (180 test xanh) | đã xoá `wt/a9-g1` | Bộ ảnh chuẩn chặn bởi Đợt 0 |
-| A3 ComfyUI | 2 | Phần 1 (adapter, manifest, preflight) xong: Codex viết, review ĐẠT, merge (237 test) | đã xoá | Workflow thật + model chờ Đợt 0; 5 mục NÊN SỬA trong `docs/agent-reviews/a3-comfyui.md` |
+| A9 Kiểm thử | 1-2 | G1 ĐẠT. Đợt 2: `golden.json` + `run_golden` (báo cáo HTML so lần trước), G2 đã kiểm (Claude làm) | đã xoá | Ảnh chuẩn để ở `data/golden/` (repo công khai, không commit ảnh); mới 2/5 cảnh |
+| A3 ComfyUI | 2 | Phần 1 + phần 2 xong (Codex viết, review ĐẠT, merge): ComfyUI đăng ký trong API, cache preflight, timeout 600 s | đã xoá | NÊN SỬA còn lại: `docs/agent-reviews/a3-comfyui-part2.md`, `docs/gates/G2.md` mục Ghi nhận |
 | A4 Gemini | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Chưa gọi Gemini thật lần nào |
 | A5 Prompt & Reference | 2 | Xong, review ĐẠT, merge (Claude làm) | đã xoá | Orchestrator chưa dùng A5 (nối cùng A3) |
 | A6 Giao diện | 2 | Xong, review ĐẠT, merge (Claude làm); đã chạy tay trong trình duyệt; thêm URL dự án `#/projects/<id>` | đã xoá | Chưa có nút Loại (hợp đồng không có) |
@@ -16,8 +16,8 @@ Cập nhật 05/10/2026. Đợt hiện tại: **Đợt 2** — A4, A5, A6 xong v
 ## Đề bài đang mở
 
 - A0 nối A5 vào orchestrator + NÊN SỬA A2: xong, merge (218 test).
-- A9 Đợt 2 (bộ ảnh chuẩn, `run_golden`, cổng G2): chờ đủ 5 cảnh.
-- A3 phần 2: đăng ký `ComfyUIProvider` trong API trỏ manifest Klein; các mục NÊN SỬA còn lại.
+- G2: chạy lại `run_golden --provider comfyui` khi đủ 5 cảnh, chủ dự án chấm `report.html`.
+- Trước Đợt 3: cancel gửi `/interrupt`, preflight báo VRAM thấp, bỏ mock khỏi danh sách mặc định.
 
 Đã đóng: A4, A5, A6 (đề bài, note, review trong `docs/agent-*`). A0 thêm vào API: đăng ký Gemini, `GET /projects/{id}/scenes`, `GET /style-packs/{id}/versions`. A9 đóng (`docs/agent-tasks/a9-g1.md`, `docs/gates/G1.md`). A2 đóng (đề bài `docs/agent-tasks/a2-api.md`, note `docs/agent-notes/a2-api.md`, review `docs/agent-reviews/a2-api.md`).
 
